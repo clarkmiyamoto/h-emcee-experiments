@@ -3,24 +3,25 @@ from hemcee.tests.distribution import make_gaussian, _make_covariance_skewed
 
 import jax
 import jax.numpy as jnp
-import numpy as np
 
-import corner
+from configuration import parse_args, make_sampler
 
 # RNG Settings
 seed = 0
 
 # Distribution Settings
-dim = 100
+dim = 3
 condition_number = 1000
 
 # Sampler Settings
 total_chains = dim * 2
-step_size: float = 0.1 # Step size of leapfrog integrator
-L: int = 10  # Number of leapfrog steps
+warmup = 0
+num_samples = 1000
+thin_by = 1
 
 
 if __name__ == "__main__":
+    args = parse_args()
     seed = 0
     key = jax.random.PRNGKey(seed)
     keys = jax.random.split(key, 3)
@@ -30,34 +31,37 @@ if __name__ == "__main__":
     
     log_prob = make_gaussian(true_precision, true_mean)
 
-    sampler = hemcee.sampler.HamiltonianSampler(
-        total_chains=total_chains,
-        dim=dim,
-        log_prob=log_prob,
-        step_size=step_size,
-        L=L,
-    )
+    sampler = make_sampler(move_type=args.move,
+                           total_chains=total_chains,
+                           dim=dim,
+                           log_prob=log_prob,
+                           step_size=args.hamiltonian_step_size,
+                           L=args.hamiltonian_L)
 
     initial_state = jax.random.normal(keys[1], shape=(total_chains, dim))
     samples = sampler.run_mcmc(
         key=keys[1],
         initial_state=initial_state,
-        num_samples=10000,
-        warmup=0,
-        adapt_step_size=True,
-        thin_by=10,)
+        num_samples=num_samples,
+        warmup=warmup,
+        thin_by=thin_by,)
     
 
     print('Diagonstics:')
-    acceptance_rate_warmup = sampler.diagnostics_warmup['acceptance_rate']
+    try:
+        acceptance_rate_warmup = sampler.diagnostics_warmup['acceptance_rate']
+        print(f'  Average warmup acceptance rate: {jnp.mean(acceptance_rate_warmup):.3f}')
+    except:
+        pass
     acceptance_rate_main = sampler.diagnostics_main['acceptance_rate']
-
-    print(f'  Average warmup acceptance rate: {jnp.mean(acceptance_rate_warmup):.3f}')
     print(f'  Average main acceptance rate: {jnp.mean(acceptance_rate_main):.3f}')
 
     print('Autocorrelation:')
-    tau = hemcee.autocorr.integrated_time(samples)
-    print(f'  Integrated autocorrelation: {tau:.3f}')
+    try:
+        tau = hemcee.autocorr.integrated_time(samples)
+        print(f'  Integrated autocorrelation: {tau}')
+    except:
+        pass
     
     print('Truth vs Empirical:')
     empirical_mean = jnp.mean(samples, axis=(0,1))
