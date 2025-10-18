@@ -18,6 +18,7 @@ OVERLAY_FILE=/scratch/cm6627/hemcee_env/overlay-15GB-500K.ext3:ro
 SINGULARITY_IMAGE=/scratch/work/public/singularity/cuda12.2.2-cudnn8.9.4-devel-ubuntu22.04.3.sif
 
 PYTHON_FILE=gaussian.py
+export PYTHONUNBUFFERED=1
 
 singularity exec --nv \
   --overlay $OVERLAY_FILE \
