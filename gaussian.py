@@ -21,30 +21,61 @@ thin_by = 10
 
 
 if __name__ == "__main__":
+    import sys
+    import time
+    
     args = parse_args()
+    
+    print("="*60)
+    print("GAUSSIAN DISTRIBUTION MCMC SAMPLING")
+    print("="*60)
+    print(f"Move type: {args.move}")
+    print(f"Step size: {args.hamiltonian_step_size}")
+    print(f"Integration length: {args.hamiltonian_L}")
+    print(f"Dimension: {dim}")
+    print(f"Total chains: {total_chains}")
+    print(f"Warmup samples: {warmup}")
+    print(f"Main samples: {num_samples}")
+    print(f"Thin by: {thin_by}")
+    print("="*60)
     seed = 0
     key = jax.random.PRNGKey(seed)
     keys = jax.random.split(key, 3)
 
+    print("Generating true distribution parameters...")
     true_mean = jax.random.normal(keys[1], shape=(dim,))
     true_precision = _make_covariance_skewed(keys[0], dim, condition_number)
     
     log_prob = make_gaussian(true_precision, true_mean)
+    print("✓ Distribution parameters generated")
 
+    print("Creating sampler...")
     sampler = make_sampler(move_type=args.move,
                            total_chains=total_chains,
                            dim=dim,
                            log_prob=log_prob,
                            step_size=args.hamiltonian_step_size,
                            L=args.hamiltonian_L)
+    print("✓ Sampler created")
 
+    print("Initializing chains...")
     initial_state = jax.random.normal(keys[1], shape=(total_chains, dim))
+    print("✓ Chains initialized")
+    
+    print("Starting MCMC sampling...")
+    print(f"  Warmup phase: {warmup} samples")
+    print(f"  Main phase: {num_samples} samples")
+    start_time = time.time()
+    
     samples = sampler.run_mcmc(
         key=keys[1],
         initial_state=initial_state,
         num_samples=num_samples,
         warmup=warmup,
         thin_by=thin_by,)
+    
+    end_time = time.time()
+    print(f"✓ MCMC sampling completed in {end_time - start_time:.2f} seconds")
     
 
     print('Diagonstics:')

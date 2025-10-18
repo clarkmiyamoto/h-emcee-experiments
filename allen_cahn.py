@@ -94,14 +94,34 @@ def create_initial_state(key, total_chains, dim):
 
 
 if __name__ == "__main__":
+    import time
+    
     args = parse_args()
+    
+    print("="*60)
+    print("ALLEN-CAHN EQUATION MCMC SAMPLING")
+    print("="*60)
+    print(f"Move type: {args.move}")
+    print(f"Step size: {args.hamiltonian_step_size}")
+    print(f"Integration length: {args.hamiltonian_L}")
+    print(f"Discretization points: {n_points}")
+    print(f"Grid spacing: {dx:.4f}")
+    print(f"Total chains: {total_chains}")
+    print(f"Warmup samples: {warmup}")
+    print(f"Main samples: {num_samples}")
+    print(f"Thin by: {thin_by}")
+    print("="*60)
+    
     seed = 0
     key = jax.random.PRNGKey(seed)
     keys = jax.random.split(key, 3)
 
+    print("Setting up Allen-Cahn equation...")
     # Create the log probability function
     log_prob = allen_cahn_log_prob
+    print("✓ Log probability function created")
 
+    print("Creating sampler...")
     # Create sampler
     sampler = make_sampler(move_type=args.move,
                            total_chains=total_chains,
@@ -109,9 +129,17 @@ if __name__ == "__main__":
                            log_prob=log_prob,
                            step_size=args.hamiltonian_step_size,
                            L=args.hamiltonian_L)
+    print("✓ Sampler created")
 
+    print("Creating initial state...")
     # Create initial state
     initial_state = create_initial_state(keys[1], total_chains, dim)
+    print("✓ Initial state created (mixture near ±1)")
+    
+    print("Starting MCMC sampling...")
+    print(f"  Warmup phase: {warmup} samples")
+    print(f"  Main phase: {num_samples} samples")
+    start_time = time.time()
     
     # Run MCMC
     samples = sampler.run_mcmc(
@@ -121,6 +149,9 @@ if __name__ == "__main__":
         warmup=warmup,
         thin_by=thin_by,
     )
+    
+    end_time = time.time()
+    print(f"✓ MCMC sampling completed in {end_time - start_time:.2f} seconds")
     
     print('Allen-Cahn Equation MCMC Diagnostics:')
     print(f'  Discretization points: {n_points}')

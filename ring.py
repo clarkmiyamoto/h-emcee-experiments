@@ -44,27 +44,55 @@ def make_ring_distribution(l):
 
 
 if __name__ == "__main__":
+    import time
+    
     args = parse_args()
+    
+    print("="*60)
+    print("RING DISTRIBUTION MCMC SAMPLING")
+    print("="*60)
+    print(f"Move type: {args.move}")
+    print(f"Step size: {args.hamiltonian_step_size}")
+    print(f"Integration length: {args.hamiltonian_L}")
+    print(f"Dimension: {dim}")
+    print(f"Ring thickness parameter: {l}")
+    print(f"Total chains: {total_chains}")
+    print(f"Warmup samples: {warmup}")
+    print(f"Main samples: {num_samples}")
+    print(f"Thin by: {thin_by}")
+    print("="*60)
+    
     seed = 0
     key = jax.random.PRNGKey(seed)
     keys = jax.random.split(key, 3)
 
+    print("Creating ring distribution...")
     # Create ring distribution
     log_prob = make_ring_distribution(l)
+    print("✓ Ring distribution created")
 
+    print("Creating sampler...")
     sampler = make_sampler(move_type=args.move,
                            total_chains=total_chains,
                            dim=dim,
                            log_prob=log_prob,
                            step_size=args.hamiltonian_step_size,
                            L=args.hamiltonian_L)
+    print("✓ Sampler created")
 
+    print("Initializing chains near unit sphere...")
     # Initialize chains near the ring (unit sphere)
     # Start with random points on unit sphere plus small noise
     initial_directions = jax.random.normal(keys[1], shape=(total_chains, dim))
     initial_directions = initial_directions / jnp.linalg.norm(initial_directions, axis=1, keepdims=True)
     initial_noise = 0.1 * jax.random.normal(keys[2], shape=(total_chains, dim))
     initial_state = initial_directions + initial_noise
+    print("✓ Chains initialized near unit sphere")
+    
+    print("Starting MCMC sampling...")
+    print(f"  Warmup phase: {warmup} samples")
+    print(f"  Main phase: {num_samples} samples")
+    start_time = time.time()
     
     samples = sampler.run_mcmc(
         key=keys[1],
@@ -72,6 +100,9 @@ if __name__ == "__main__":
         num_samples=num_samples,
         warmup=warmup,
         thin_by=thin_by,)
+    
+    end_time = time.time()
+    print(f"✓ MCMC sampling completed in {end_time - start_time:.2f} seconds")
     
 
     print('Diagnostics:')
