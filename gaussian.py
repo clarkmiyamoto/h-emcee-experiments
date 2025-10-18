@@ -10,14 +10,14 @@ from configuration import parse_args, make_sampler
 seed = 0
 
 # Distribution Settings
-dim = 3
+dim = 128
 condition_number = 1000
 
 # Sampler Settings
 total_chains = dim * 2
-warmup = 0
-num_samples = 1000
-thin_by = 1
+warmup = int(2 * 10**5)
+num_samples = int(10**6)
+thin_by = 10
 
 
 if __name__ == "__main__":

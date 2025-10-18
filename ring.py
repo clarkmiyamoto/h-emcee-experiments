@@ -8,14 +8,14 @@ from configuration import parse_args, make_sampler
 seed = 0
 
 # Distribution Settings
-dim = 3
-l = 0.1  # Ring thickness parameter
+dim = 50
+l = 0.25  # Ring thickness parameter
 
 # Sampler Settings
 total_chains = dim * 2
-warmup = 0
-num_samples = 1000
-thin_by = 1
+warmup = int(2 * 10**5)
+num_samples = int(10**6)
+thin_by = 10
 
 
 def make_ring_distribution(l):

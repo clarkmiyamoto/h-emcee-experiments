@@ -10,15 +10,15 @@ seed = 0
 
 # Distribution Settings
 # Discretize the unit interval [0,1] into n_points
-n_points = 50  # Number of discretization points
+n_points = 128  # Number of discretization points
 dim = n_points  # Dimension of the state space
 dx = 1.0 / (n_points - 1)  # Grid spacing
 
 # Sampler Settings
 total_chains = dim * 2
-warmup = 0
-num_samples = 1000
-thin_by = 1
+warmup = int(2 * 10**5)
+num_samples = int(10**6)
+thin_by = 10
 
 
 def double_well_potential(u):
