@@ -17,7 +17,7 @@ module purge
 OVERLAY_FILE=/scratch/cm6627/hemcee_env/overlay-15GB-500K.ext3:ro
 SINGULARITY_IMAGE=/scratch/work/public/singularity/cuda12.3.2-cudnn9.0.0-ubuntu-22.04.4.sif
 
-PYTHON_FILE=high_dimensional_gaussian.py
+PYTHON_FILE=gaussian.py
 
 singularity exec --nv \
   --overlay $OVERLAY_FILE \
