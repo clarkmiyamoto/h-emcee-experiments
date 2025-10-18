@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --time=0:10:00
 #SBATCH --gres=gpu:1
-#SBATCH --mem=32GB
+#SBATCH --mem=64GB
 #SBATCH --job-name=HighDimensionalGaussian
 #SBATCH --mail-type=END
 #SBATCH --mail-user=cm6627@nyu.edu

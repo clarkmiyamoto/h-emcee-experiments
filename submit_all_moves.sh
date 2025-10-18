@@ -27,7 +27,7 @@ cat > $SBATCH_TEMPLATE << 'EOF'
 #SBATCH --cpus-per-task=8
 #SBATCH --time=1:00:00
 #SBATCH --gres=gpu:1
-#SBATCH --mem=36GB
+#SBATCH --mem=64GB
 #SBATCH --job-name=JOB_NAME_PLACEHOLDER
 #SBATCH --mail-type=END
 #SBATCH --mail-user=cm6627@nyu.edu
