@@ -74,7 +74,10 @@ create_and_submit_sbatch() {
     echo "Submitting job: $job_name"
     sbatch $sbatch_file
     
-    echo "Submitted: $sbatch_file"
+    # Remove the sbatch file after submission
+    rm $sbatch_file
+    
+    echo "Submitted: $job_name (sbatch file removed)"
     echo "---"
 }
 
