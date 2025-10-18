@@ -2,7 +2,6 @@ import hemcee
 import jax
 import jax.numpy as jnp
 from jax import grad, vmap
-jax.config.update('jax_platform_name', 'cpu')
 jax.config.update("jax_enable_x64", True)
 
 from configuration import parse_args, make_sampler
