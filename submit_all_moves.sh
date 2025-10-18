@@ -26,7 +26,7 @@ cat > $SBATCH_TEMPLATE << 'EOF'
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=1:00:00
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:v100:1
 #SBATCH --mem=64GB
 #SBATCH --job-name=JOB_NAME_PLACEHOLDER
 #SBATCH --mail-type=END
@@ -37,7 +37,7 @@ cat > $SBATCH_TEMPLATE << 'EOF'
 module purge
 
 OVERLAY_FILE=/scratch/cm6627/hemcee_env/overlay-15GB-500K.ext3:ro
-SINGULARITY_IMAGE=/scratch/work/public/singularity/cuda12.3.2-cudnn9.0.0-ubuntu-22.04.4.sif
+SINGULARITY_IMAGE=/scratch/work/public/singularity/cuda12.2.2-cudnn8.9.4-devel-ubuntu22.04.3.sif
 
 PYTHON_FILE=PYTHON_FILE_PLACEHOLDER
 MOVE_TYPE=MOVE_TYPE_PLACEHOLDER
