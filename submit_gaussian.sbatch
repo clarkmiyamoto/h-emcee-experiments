@@ -22,4 +22,4 @@ PYTHON_FILE=high_dimensional_gaussian.py
 singularity exec --nv \
   --overlay $OVERLAY_FILE \
   $SINGULARITY_IMAGE \
-  /bin/bash -c "source /ext3/env.sh; python $PYTHON_FILE"
+  /bin/bash -c "source /ext3/env.sh; python $PYTHON_FILE --move=hmc_walk"
