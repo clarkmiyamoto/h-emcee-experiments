@@ -2,8 +2,9 @@
 
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=32
+#SBATCH --cpus-per-task=16
 #SBATCH --time=1:00:00
+#SBATCH --gres=gpu:1
 #SBATCH --mem=32GB
 #SBATCH --job-name=HighDimensionalGaussian
 #SBATCH --mail-type=END
