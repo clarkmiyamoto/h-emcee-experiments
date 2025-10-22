@@ -7,6 +7,7 @@ from hemcee.moves.vanilla.stretch import stretch_move
 from hemcee.moves.vanilla.walk import walk_move
 from hemcee.moves.vanilla.side import side_move
 
+import jax
 import jax.numpy as jnp
 
 cpu_device = jax.devices('cpu')[0]
