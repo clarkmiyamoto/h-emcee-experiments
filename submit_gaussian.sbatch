@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --time=0:15:00
-#SBATCH --gres=gpu:v100:1
+#SBATCH --gres=gpu:rtx8000:1
 #SBATCH --mem=200GB
 #SBATCH --job-name=HighDimensionalGaussian
 #SBATCH --mail-type=END
