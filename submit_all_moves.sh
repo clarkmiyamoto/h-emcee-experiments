@@ -74,7 +74,8 @@ create_and_submit_sbatch() {
     echo "Submitting job: $job_name"
     sbatch $sbatch_file
     
-    # Remove the sbatch file after submission
+    # Wait a bit (0.5 seconds) to ensure the HPC scheduler sees the sbatch file before removal
+    sleep 0.5  # units: seconds
     rm $sbatch_file
     
     echo "Submitted: $job_name (sbatch file removed)"
