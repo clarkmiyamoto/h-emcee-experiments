@@ -5,7 +5,8 @@ import jax
 import jax.numpy as jnp
 jax.config.update("jax_enable_x64", False)
 
-from configuration import parse_args, make_sampler
+from configuration import parse_args, make_sampler, monitor_gpu
+monitor_gpu()
 
 # RNG Settings
 seed = 0

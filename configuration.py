@@ -74,3 +74,8 @@ def make_sampler(move_type,
                                       storage_device=cpu_device)
     else:
         raise ValueError(f"Unknown move type: {move_type}")
+    
+def monitor_gpu():
+    # GPU Tracking
+    import wandb
+    wandb.init(project="gpu-monitor", config={"purpose": "hardware monitoring"})
