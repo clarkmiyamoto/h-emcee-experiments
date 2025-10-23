@@ -1,7 +1,7 @@
 import hemcee
 import jax
 import jax.numpy as jnp
-jax.config.update("jax_enable_x64", True)
+jax.config.update("jax_enable_x64", False)
 
 from configuration import parse_args, make_sampler
 
@@ -100,7 +100,8 @@ if __name__ == "__main__":
         initial_state=initial_state,
         num_samples=num_samples,
         warmup=warmup,
-        thin_by=thin_by,)
+        thin_by=thin_by,
+        show_progress=True)
     
     end_time = time.time()
     print(f"✓ MCMC sampling completed in {end_time - start_time:.2f} seconds")

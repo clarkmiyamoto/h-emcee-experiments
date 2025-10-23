@@ -2,7 +2,7 @@ import hemcee
 import jax
 import jax.numpy as jnp
 from jax import grad, vmap
-jax.config.update("jax_enable_x64", True)
+jax.config.update("jax_enable_x64", False)
 
 from configuration import parse_args, make_sampler
 
@@ -149,6 +149,7 @@ if __name__ == "__main__":
         num_samples=num_samples,
         warmup=warmup,
         thin_by=thin_by,
+        show_progress=True
     )
     
     end_time = time.time()
