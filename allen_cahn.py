@@ -4,10 +4,9 @@ import jax.numpy as jnp
 from jax import grad, vmap
 jax.config.update("jax_enable_x64", False)
 
-from configuration import parse_args, make_sampler
+from configuration import parse_args, make_sampler, plot_samples
 
-# RNG Settings
-seed = 0
+# RNG Settings will be set from command line arguments
 
 # Distribution Settings
 # Discretize the unit interval [0,1] into n_points
@@ -111,10 +110,10 @@ if __name__ == "__main__":
     print(f"Warmup samples: {warmup}")
     print(f"Main samples: {num_samples}")
     print(f"Thin by: {thin_by}")
+    print(f"Seed: {args.seed}")
     print("="*60)
     
-    seed = 0
-    key = jax.random.PRNGKey(seed)
+    key = jax.random.PRNGKey(args.seed)
     keys = jax.random.split(key, 3)
 
     print("Setting up Allen-Cahn equation...")
@@ -199,3 +198,10 @@ if __name__ == "__main__":
     print(f'  Std energy: {jnp.std(energies):.3f}')
     print(f'  Min energy: {jnp.min(energies):.3f}')
     print(f'  Max energy: {jnp.max(energies):.3f}')
+    
+    # Generate corner plot if requested
+    if args.plot:
+        title = f"Allen-Cahn Equation - {args.move}"
+        filename = f"allen_cahn_samples_corner_{args.move}_s{args.hamiltonian_step_size}_L{args.hamiltonian_L}"
+        labels = [f'u(x{i})' for i in range(dim)]
+        plot_samples(samples, dim, title, filename, labels)

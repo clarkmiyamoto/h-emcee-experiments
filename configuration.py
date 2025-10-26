@@ -19,6 +19,10 @@ def parse_args():
                         help='Step size of the leapfrog integrator.')
     parser.add_argument('--hamiltonian_L', type=int, default=10,
                         help='Number of leapfrog steps per sample.')
+    parser.add_argument('--plot', action='store_true', default=False,
+                        help='Generate corner plot of samples.')
+    parser.add_argument('--seed', type=int, default=0,
+                        help='Random seed for reproducibility.')
     args = parser.parse_args()
     return args
 
@@ -67,6 +71,53 @@ def make_sampler(move_type,
     else:
         raise ValueError(f"Unknown move type: {move_type}")
     
+def plot_samples(samples, dim, title, filename, labels=None):
+    """
+    Generate and save a corner plot of MCMC samples.
+    
+    Parameters:
+    samples: JAX array of shape (num_samples, total_chains, dim)
+    dim: int, dimension of the state space
+    title: str, title for the plot
+    filename: str, filename to save the plot (without extension)
+    labels: list of str, optional labels for each dimension
+    """
+    print("Generating corner plot...")
+    try:
+        import corner
+        import matplotlib.pyplot as plt
+        import numpy as np
+        
+        # Convert JAX arrays to numpy for corner plot
+        samples_np = np.array(samples)
+        
+        # Use a subset of samples for plotting (last 10% to avoid memory issues)
+        nshow = int(0.1 * samples_np.shape[0])
+        samples_plot = samples_np[-nshow:].reshape(-1, dim)
+        
+        # Create default labels if not provided
+        if labels is None:
+            labels = [f'x{i}' for i in range(dim)]
+        
+        # Create corner plot
+        fig = corner.corner(samples_plot, 
+                          labels=labels,
+                          title=title,
+                          show_titles=True)
+        
+        # Save the plot
+        plot_filename = f'{filename}.png'
+        plt.savefig(plot_filename, dpi=150, bbox_inches='tight')
+        print(f"✓ Corner plot saved as: {plot_filename}")
+        
+        # Show the plot
+        plt.show()
+        
+    except ImportError:
+        print("Warning: corner and matplotlib not available. Skipping plot generation.")
+    except Exception as e:
+        print(f"Warning: Error generating corner plot: {e}")
+
 def monitor_gpu():
     # GPU Tracking
     import wandb

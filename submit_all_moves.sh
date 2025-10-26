@@ -13,7 +13,7 @@ HMC_MOVE_TYPES=("hmc" "hmc_walk" "hmc_side")
 HMC_PARAMS=("0.5,2" "0.1,10")
 
 # Define the Python files to run (you can modify this list as needed)
-PYTHON_FILES=("gaussian.py" "allen_cahn.py" "ring.py")
+PYTHON_FILES=("gaussian.py" "allen_cahn.py" "ring.py" "gaussian_mixture.py")
 
 # Base sbatch template (will be modified for each job)
 SBATCH_TEMPLATE="submit_template.sbatch"

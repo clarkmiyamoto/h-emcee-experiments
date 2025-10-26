@@ -3,10 +3,9 @@ import jax
 import jax.numpy as jnp
 jax.config.update("jax_enable_x64", False)
 
-from configuration import parse_args, make_sampler
+from configuration import parse_args, make_sampler, plot_samples
 
-# RNG Settings
-seed = 0
+# RNG Settings will be set from command line arguments
 
 # Distribution Settings
 dim = 12
@@ -61,10 +60,10 @@ if __name__ == "__main__":
     print(f"Warmup samples: {warmup}")
     print(f"Main samples: {num_samples}")
     print(f"Thin by: {thin_by}")
+    print(f"Seed: {args.seed}")
     print("="*60)
     
-    seed = 0
-    key = jax.random.PRNGKey(seed)
+    key = jax.random.PRNGKey(args.seed)
     keys = jax.random.split(key, 3)
 
     print("Creating ring distribution...")
@@ -149,5 +148,11 @@ if __name__ == "__main__":
     print(f"  Empirical mean: {empirical_mean}")
     print(f"  Empirical mean magnitude: {jnp.linalg.norm(empirical_mean):.3f}")
     print(f"  Empirical covariance trace: {jnp.trace(empirical_cov):.3f}")
+    
+    # Generate corner plot if requested
+    if args.plot:
+        title = f"Ring Distribution - {args.move}"
+        filename = f"ring_samples_corner_{args.move}_s{args.hamiltonian_step_size}_L{args.hamiltonian_L}"
+        plot_samples(samples, dim, title, filename)
 
 
