@@ -11,7 +11,7 @@ seed = 0
 
 # Distribution Settings
 # Discretize the unit interval [0,1] into n_points
-n_points = 128  # Number of discretization points
+n_points = 12  # Number of discretization points
 dim = n_points  # Dimension of the state space
 dx = 1.0 / (n_points - 1)  # Grid spacing
 
