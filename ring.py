@@ -9,7 +9,7 @@ from configuration import parse_args, make_sampler
 seed = 0
 
 # Distribution Settings
-dim = 50
+dim = 12
 l = 0.25  # Ring thickness parameter
 
 # Sampler Settings

@@ -10,8 +10,6 @@ from hemcee.moves.vanilla.side import side_move
 import jax
 import jax.numpy as jnp
 
-cpu_device = jax.devices('cpu')[0]
-
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--move', type=str,
@@ -36,42 +34,36 @@ def make_sampler(move_type,
                                          log_prob=log_prob,
                                          step_size=step_size,
                                          inv_mass_matrix=jnp.eye(dim),
-                                         L=L,
-                                         storage_device=cpu_device)
+                                         L=L,)
     elif move_type == 'hmc_walk':
         return hemcee.HamiltonianEnsembleSampler(total_chains=total_chains,
                                                  dim=dim,
                                                  log_prob=log_prob,
                                                  step_size=step_size,
                                                  L=L,
-                                                 move=hmc_walk_move,
-                                                 storage_device=cpu_device)
+                                                 move=hmc_walk_move,)
     elif move_type == 'hmc_side':
         return hemcee.HamiltonianEnsembleSampler(total_chains=total_chains,
                                                  dim=dim,
                                                  log_prob=log_prob,
                                                  step_size=step_size,
                                                  L=L,
-                                                 move=hmc_side_move,
-                                                 storage_device=cpu_device)
+                                                 move=hmc_side_move,)
     elif move_type == 'stretch':
         return hemcee.EnsembleSampler(total_chains=total_chains,
                                       dim=dim,
                                       log_prob=log_prob,
-                                      move=stretch_move,
-                                      storage_device=cpu_device)
+                                      move=stretch_move,)
     elif move_type == 'walk':
         return hemcee.EnsembleSampler(total_chains=total_chains,
                                       dim=dim,
                                       log_prob=log_prob,
-                                      move=walk_move,
-                                      storage_device=cpu_device)
+                                      move=walk_move,)
     elif move_type == 'side':
         return hemcee.EnsembleSampler(total_chains=total_chains,
                                       dim=dim,
                                       log_prob=log_prob,
-                                      move=side_move,
-                                      storage_device=cpu_device)
+                                      move=side_move,)
     else:
         raise ValueError(f"Unknown move type: {move_type}")
     
