@@ -26,7 +26,7 @@ cat > $SBATCH_TEMPLATE << 'EOF'
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
-#SBATCH --time=2:00:00
+#SBATCH --time=TIME_PLACEHOLDER
 #SBATCH --gres=gpu:rtx8000:1
 #SBATCH --mem=200GB
 #SBATCH --job-name=JOB_NAME_PLACEHOLDER
@@ -66,21 +66,34 @@ EOF
 
 echo "Generated sbatch template: $SBATCH_TEMPLATE"
 
+# Function to determine time limit based on Python file
+get_time_limit() {
+    local python_file=$1
+    case "$python_file" in
+        "gaussian.py"|"gaussian_mixture.py")
+            echo "3:00:00"
+            ;;
+        *)
+            echo "2:00:00"
+            ;;
+    esac
+}
+
 # Function to create and submit sbatch for a specific move type and python file
 create_and_submit_sbatch() {
     local move_type=$1
     local python_file=$2
+    echo "Creating sbatch file for $move_type with $python_file (step_size=$step_size, L=$integration_length, adapt_step_size=$adapt_step_size, adapt_length=$adapt_length)..."
     local step_size=$3
     local integration_length=$4
     local adapt_step_size=$5
     local adapt_length=$6
+    local time_limit=$7
     local job_name="${python_file%.*}_${move_type}_s${step_size}_L${integration_length}_adapt${adapt_step_size}${adapt_length}"
     local sbatch_file="submit_${job_name}.sbatch"
     
-    echo "Creating sbatch file for $move_type with $python_file (step_size=$step_size, L=$integration_length, adapt_step_size=$adapt_step_size, adapt_length=$adapt_length)..."
-    
     # Create the sbatch file by replacing placeholders
-    sed "s/JOB_NAME_PLACEHOLDER/$job_name/g; s/PYTHON_FILE_PLACEHOLDER/$python_file/g; s/MOVE_TYPE_PLACEHOLDER/$move_type/g; s/STEP_SIZE_PLACEHOLDER/$step_size/g; s/INTEGRATION_LENGTH_PLACEHOLDER/$integration_length/g; s/ADAPT_STEP_SIZE_PLACEHOLDER/$adapt_step_size/g; s/ADAPT_LENGTH_PLACEHOLDER/$adapt_length/g" $SBATCH_TEMPLATE > $sbatch_file
+    sed "s/JOB_NAME_PLACEHOLDER/$job_name/g; s/PYTHON_FILE_PLACEHOLDER/$python_file/g; s/MOVE_TYPE_PLACEHOLDER/$move_type/g; s/STEP_SIZE_PLACEHOLDER/$step_size/g; s/INTEGRATION_LENGTH_PLACEHOLDER/$integration_length/g; s/ADAPT_STEP_SIZE_PLACEHOLDER/$adapt_step_size/g; s/ADAPT_LENGTH_PLACEHOLDER/$adapt_length/g; s/TIME_PLACEHOLDER/$time_limit/g" $SBATCH_TEMPLATE > $sbatch_file
     
     # Make the sbatch file executable
     chmod +x $sbatch_file
@@ -104,7 +117,8 @@ echo "=========================================="
 echo "Experiment 1: Adaptive parameters (adapt_step_size=True, adapt_length=True)"
 for python_file in "${PYTHON_FILES[@]}"; do
     if [ -f "$python_file" ]; then
-        create_and_submit_sbatch "hmc_walk" "$python_file" "0.1" "10" "true" "true"
+        time_limit=$(get_time_limit "$python_file")
+        create_and_submit_sbatch "hmc_walk" "$python_file" "0.1" "10" "true" "true" "$time_limit"
     fi
 done
 
@@ -112,7 +126,8 @@ done
 echo "Experiment 2: Fixed parameters (step_size=0.1, integration_length=10)"
 for python_file in "${PYTHON_FILES[@]}"; do
     if [ -f "$python_file" ]; then
-        create_and_submit_sbatch "hmc_walk" "$python_file" "0.1" "10" "false" "false"
+        time_limit=$(get_time_limit "$python_file")
+        create_and_submit_sbatch "hmc_walk" "$python_file" "0.1" "10" "false" "false" "$time_limit"
     fi
 done
 
@@ -120,7 +135,8 @@ done
 echo "Experiment 3: Fixed parameters (step_size=0.5, integration_length=2)"
 for python_file in "${PYTHON_FILES[@]}"; do
     if [ -f "$python_file" ]; then
-        create_and_submit_sbatch "hmc_walk" "$python_file" "0.5" "2" "false" "false"
+        time_limit=$(get_time_limit "$python_file")
+        create_and_submit_sbatch "hmc_walk" "$python_file" "0.5" "2" "false" "false" "$time_limit"
     fi
 done
 
@@ -144,16 +160,19 @@ for move_type in "${MOVE_TYPES[@]}"; do
                 continue
             fi
             
+            # Get time limit for this Python file
+            time_limit=$(get_time_limit "$python_file")
+            
             # Check if this is an HMC-based move type
             if [[ " ${HMC_MOVE_TYPES[@]} " =~ " ${move_type} " ]]; then
                 # For HMC moves, create jobs with different parameter combinations
                 for params in "${HMC_PARAMS[@]}"; do
                     IFS=',' read -r step_size integration_length adapt_step_size adapt_length <<< "$params"
-                    create_and_submit_sbatch "$move_type" "$python_file" "$step_size" "$integration_length" "$adapt_step_size" "$adapt_length"
+                    create_and_submit_sbatch "$move_type" "$python_file" "$step_size" "$integration_length" "$adapt_step_size" "$adapt_length" "$time_limit"
                 done
             else
                 # For non-HMC moves, use default parameters (they won't be used anyway)
-                create_and_submit_sbatch "$move_type" "$python_file" "0.1" "10" "false" "false"
+                create_and_submit_sbatch "$move_type" "$python_file" "0.1" "10" "false" "false" "$time_limit"
             fi
         else
             echo "Warning: $python_file not found, skipping..."

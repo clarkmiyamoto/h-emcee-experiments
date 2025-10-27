@@ -52,6 +52,14 @@ if __name__ == "__main__":
     print("RING DISTRIBUTION MCMC SAMPLING")
     print("="*60)
     print(f"Move type: {args.move}")
+    
+    # Autotuning information
+    if args.move in ['hmc', 'hmc_walk', 'hmc_side']:
+        print(f"Step size adaptation: {'Enabled' if args.adapt_step_size else 'Disabled'}")
+        print(f"Integration length adaptation: {'Enabled' if args.adapt_length else 'Disabled'}")
+    else:
+        print("Autotuning: Not available for this move type")
+    
     print(f"Step size: {args.hamiltonian_step_size}")
     print(f"Integration length: {args.hamiltonian_L}")
     print(f"Dimension: {dim}")
@@ -121,6 +129,21 @@ if __name__ == "__main__":
     try:
         tau = hemcee.autocorr.integrated_time(samples)
         print(f'  Integrated autocorrelation: {tau}')
+        
+        # Calculate autocorrelation time per total compute time
+        total_compute_time = end_time - start_time
+        tau_over_time = tau / total_compute_time
+        print(f'  Autocorrelation time / total compute time: {tau_over_time:.6f}')
+        
+        # Calculate Effective Sample Size (EES)
+        # EES = num_samples * total_chains / tau
+        total_samples = num_samples * total_chains
+        ees = total_samples / tau
+        print(f'  EES (Effective Sample Size): {ees:.2f}')
+        
+        # Calculate EES per total compute time
+        ees_per_time = ees / total_compute_time
+        print(f'  EES / total compute time: {ees_per_time:.6f}')
     except:
         pass
     

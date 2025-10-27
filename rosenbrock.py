@@ -101,6 +101,14 @@ if __name__ == "__main__":
     print(f'  Total chains: {total_chains}')
     print(f'  Samples per chain: {num_samples}')
     
+    # Autotuning information
+    print('Autotuning Configuration:')
+    if args.move in ['hmc', 'hmc_walk', 'hmc_side']:
+        print(f'  Step size adaptation: {"Enabled" if args.adapt_step_size else "Disabled"}')
+        print(f'  Integration length adaptation: {"Enabled" if args.adapt_length else "Disabled"}')
+    else:
+        print('  No autotuning available for this move type')
+    
     try:
         acceptance_rate_warmup = sampler.diagnostics_warmup['acceptance_rate']
         print(f'  Average warmup acceptance rate: {jnp.mean(acceptance_rate_warmup):.3f}')
