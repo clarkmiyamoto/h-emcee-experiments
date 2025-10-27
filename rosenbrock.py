@@ -78,7 +78,9 @@ if __name__ == "__main__":
                            dim=dim,
                            log_prob=log_prob,
                            step_size=args.hamiltonian_step_size,
-                           L=args.hamiltonian_L)
+                           L=args.hamiltonian_L,
+                           adapt_step_size=args.adapt_step_size,
+                           adapt_length=args.adapt_length)
 
     # Create initial state
     initial_state = create_initial_state(keys[1], total_chains, dim)

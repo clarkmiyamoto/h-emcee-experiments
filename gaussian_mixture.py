@@ -15,7 +15,7 @@ overlap_factor = 0.2  # Controls overlap between modes (0 = no overlap, 1 = high
 # Sampler Settings
 total_chains = dim * 2
 warmup = int(2 * 10**5)
-num_samples = int(10**5)
+num_samples = int(10**6)
 thin_by = 10
 
 
@@ -189,7 +189,9 @@ if __name__ == "__main__":
                            dim=dim,
                            log_prob=log_prob,
                            step_size=args.hamiltonian_step_size,
-                           L=args.hamiltonian_L)
+                           L=args.hamiltonian_L,
+                           adapt_step_size=args.adapt_step_size,
+                           adapt_length=args.adapt_length)
     print("✓ Sampler created")
 
     print("Initializing chains near mixture modes...")

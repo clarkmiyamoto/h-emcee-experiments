@@ -19,6 +19,10 @@ def parse_args():
                         help='Step size of the leapfrog integrator.')
     parser.add_argument('--hamiltonian_L', type=int, default=10,
                         help='Number of leapfrog steps per sample.')
+    parser.add_argument('--adapt_step_size', action='store_true', default=False,
+                        help='Enable step size adaptation.')
+    parser.add_argument('--adapt_length', action='store_true', default=False,
+                        help='Enable integration length adaptation.')
     parser.add_argument('--plot', action='store_true', default=False,
                         help='Generate corner plot of samples.')
     parser.add_argument('--seed', type=int, default=0,
@@ -31,7 +35,9 @@ def make_sampler(move_type,
                  dim,
                  log_prob,
                  step_size,
-                 L):
+                 L,
+                 adapt_step_size,
+                 adapt_length):
     if move_type == 'hmc':
         return hemcee.HamiltonianSampler(total_chains=total_chains,
                                          dim=dim,
@@ -45,14 +51,18 @@ def make_sampler(move_type,
                                                  log_prob=log_prob,
                                                  step_size=step_size,
                                                  L=L,
-                                                 move=hmc_walk_move,)
+                                                 move=hmc_walk_move,
+                                                 adapt_step_size=adapt_step_size,
+                                                 adapt_length=adapt_length)
     elif move_type == 'hmc_side':
         return hemcee.HamiltonianEnsembleSampler(total_chains=total_chains,
                                                  dim=dim,
                                                  log_prob=log_prob,
                                                  step_size=step_size,
                                                  L=L,
-                                                 move=hmc_side_move,)
+                                                 move=hmc_side_move,
+                                                 adapt_step_size=adapt_step_size,
+                                                 adapt_length=adapt_length)
     elif move_type == 'stretch':
         return hemcee.EnsembleSampler(total_chains=total_chains,
                                       dim=dim,
